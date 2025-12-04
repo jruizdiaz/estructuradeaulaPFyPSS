@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propuesta Académica: Simulación E-commerce</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Warm Neutrals & Tech Accents -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f5f5f4; color: #44403c; }
+        .chart-container { 
+            position: relative; 
+            width: 100%; 
+            max-width: 400px; 
+            height: 300px; 
+            margin: 0 auto; 
+        }
+        .card { 
+            background: white; 
+            border-radius: 0.75rem; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); 
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 4, 6, 0.05);
+        }
+        .active-tab {
+            background-color: #4f46e5;
+            color: white;
+            border-color: #4f46e5;
+        }
+        .inactive-tab {
+            background-color: white;
+            color: #57534e;
+            border-color: #e7e5f4;
+        }
+        .inactive-tab:hover {
+            background-color: #fafaf9;
+        }
+        /* Custom scrollbar for content panels */
+        .content-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+        .content-panel::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        .content-panel::-webkit-scrollbar-thumb {
+            background: #d6d3d1; 
+            border-radius: 3px;
+        }
+        .content-panel::-webkit-scrollbar-thumb:hover {
+            background: #a8a29e; 
+        }
+        /* Basic formatting for markdown-like output */
+        .markdown-output br { display: block; content: ""; margin-top: 0.5em; }
+        .markdown-output h3 { font-size: 1.125rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; border-bottom: 1px solid #e7e5e4; padding-bottom: 0.25rem; }
+        .markdown-output ul { list-style: disc; margin-left: 1.5rem; }
+
+        /* Modal Styles */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.4); 
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto; 
+            padding: 30px;
+            border-radius: 1rem;
+            width: 90%; 
+            max-width: 800px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            animation: slide-down 0.3s ease-out;
+        }
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            transition: color 0.2s;
+        }
+        .close-btn:hover,
+        .close-btn:focus {
+            color: #4f46e5;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        @keyframes slide-down {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .folder-structure {
+            font-family: monospace;
+            white-space: pre;
+            padding: 1rem;
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-stone-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <span class="text-3xl">🚀</span>
+                <div>
+                    <h1 class="text-xl font-bold text-stone-800">Panel de Control Académico</h1>
+                    <p class="text-xs text-stone-500">Tecnicatura en E-commerce & Marketing Digital</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="text-right hidden sm:block">
+                    <p class="text-sm font-semibold text-stone-700">Estado de Simulación</p>
+                    <p class="text-xs text-green-600 font-medium">● Sistema Operativo</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        
+        <!-- Intro Section with Buttons -->
+        <section class="mb-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 space-y-3 sm:space-y-0 sm:space-x-3">
+                <h2 class="text-2xl font-bold text-stone-800">Diseño Integral de Asignatura (16 Semanas)</h2>
+                <div class="flex space-x-3">
+                    <button onclick="openModal('programModal')" class="flex items-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-sm font-semibold transition shadow-md">
+                        <span class="mr-2">📚</span> Ver Programa
+                    </button>
+                    <button onclick="openModal('structureModal')" class="flex items-center px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-lg text-sm font-semibold transition shadow-md">
+                        <span class="mr-2">📁</span> Ver Estructura de Proyecto
+                    </button>
+                </div>
+            </div>
+            <p class="text-stone-600 max-w-4xl">
+                Esta plataforma interactiva presenta la arquitectura logística y pedagógica para las asignaturas secuenciales 
+                <strong>"Proyecto Final"</strong> y <strong>"Prácticas Profesionales Situadas"</strong>. 
+                El diseño responde al desafío de gestionar <strong>300 estudiantes</strong> mediante un modelo de <strong>Empresa Simulada Digital</strong>, 
+                donde el equipo docente asume roles de "Algoritmo" y "Dirección de Cuentas" para garantizar una experiencia auténtica de mercado.
+            </p>
+        </section>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <!-- Card 1 -->
+            <div class="card p-4 border-l-4 border-blue-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold text-stone-500 uppercase tracking-wide">Matrícula</p>
+                        <h3 class="text-2xl font-bold text-stone-800">300</h3>
+                        <p class="text-xs text-stone-400">Estudiantes Activos</p>
+                    </div>
+                    <div class="text-2xl text-blue-500">👥</div>
+                </div>
+            </div>
+            <!-- Card 2 -->
+            <div class="card p-4 border-l-4 border-indigo-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold text-stone-500 uppercase tracking-wide">Duración</p>
+                        <h3 class="text-2xl font-bold text-stone-800">16 Semanas</h3>
+                        <p class="text-xs text-stone-400">2 Bloques de 8 Sem.</p>
+                    </div>
+                    <div class="text-2xl text-indigo-500">📅</div>
+                </div>
+            </div>
+            <!-- Card 3 -->
+            <div class="card p-4 border-l-4 border-purple-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold text-stone-500 uppercase tracking-wide">Estructura</p>
+                        <h3 class="text-2xl font-bold text-stone-800">4 Cámaras</h3>
+                        <p class="text-xs text-stone-400">~15 Equipos por Adjunto</p>
+                    </div>
+                    <div class="text-2xl text-purple-500">🏢</div>
+                </div>
+            </div>
+            <!-- Card 4 -->
+            <div class="card p-4 border-l-4 border-rose-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold text-stone-500 uppercase tracking-wide">Staff Docente</p>
+                        <h3 class="text-2xl font-bold text-stone-800">2 + 4</h3>
+                        <p class="text-xs text-stone-400">Titulares + Adjuntos</p>
+                    </div>
+                    <div class="text-2xl text-rose-500">🎓</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Layout Grid: Ecosystem & Timeline -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            
+            <!-- Left Column: Ecosystem Roles (1/3) -->
+            <div class="lg:col-span-1 space-y-8">
+                
+                <!-- Roles Structure -->
+                <div class="card p-6 h-full">
+                    <h3 class="text-lg font-bold text-stone-800 mb-4 flex items-center">
+                        <span class="mr-2">⚙️</span> Ecosistema de Roles
+                    </h3>
+                    <p class="text-sm text-stone-600 mb-4">
+                        El equipo docente abandona el rol tradicional para simular actores del mercado digital.
+                        Haga clic en cada rol para ver sus funciones.
+                    </p>
+                    
+                    <div class="space-y-3">
+                        <!-- Role 1 -->
+                        <div onclick="updateRoleDetails('titular')" class="cursor-pointer p-3 rounded-lg bg-stone-50 border border-stone-200 hover:bg-stone-100 transition">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 font-bold">T</div>
+                                    <div>
+                                        <p class="text-sm font-bold text-stone-800">2 Titulares</p>
+                                        <p class="text-xs text-stone-500">La Central Digital / Algoritmo</p>
+                                    </div>
+                                </div>
+                                <span class="text-stone-400">›</span>
+                            </div>
+                        </div>
+                        <!-- Role 2 -->
+                        <div onclick="updateRoleDetails('adjunto')" class="cursor-pointer p-3 rounded-lg bg-stone-50 border border-stone-200 hover:bg-stone-100 transition">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">A</div>
+                                    <div>
+                                        <p class="text-sm font-bold text-stone-800">4 Adjuntos</p>
+                                        <p class="text-xs text-stone-500">Directores de Cuentas</p>
+                                    </div>
+                                </div>
+                                <span class="text-stone-400">›</span>
+                            </div>
+                        </div>
+                        <!-- Role 3 -->
+                        <div onclick="updateRoleDetails('alumno')" class="cursor-pointer p-3 rounded-lg bg-stone-50 border border-stone-200 hover:bg-stone-100 transition">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold">E</div>
+                                    <div>
+                                        <p class="text-sm font-bold text-stone-800">300 Estudiantes</p>
+                                        <p class="text-xs text-stone-500">Gestores Digitales (Agencias)</p>
+                                    </div>
+                                </div>
+                                <span class="text-stone-400">›</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Details Panel -->
+                    <div id="role-details" class="mt-4 p-4 bg-yellow-50 rounded-lg border border-yellow-100 text-sm text-stone-700 animate-fade-in">
+                        <p class="font-semibold text-yellow-800 mb-1" id="role-title">Seleccione un rol arriba</p>
+                        <p id="role-desc">Vea cómo interactúa cada actor en la simulación.</p>
+                    </div>
+                </div>
+
+                <!-- Tech Stack -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-bold text-stone-800 mb-4 flex items-center">
+                        <span class="mr-2">🛠️</span> Stack Tecnológico
+                    </h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="flex items-center space-x-2 p-2 bg-stone-50 rounded border border-stone-100">
+                            <span class="text-blue-600 text-lg">●</span>
+                            <span class="text-xs font-semibold">Meta Ads</span>
+                        </div>
+                        <div class="flex items-center space-x-2 p-2 bg-stone-50 rounded border border-stone-100">
+                            <span class="text-orange-500 text-lg">●</span>
+                            <span class="text-xs font-semibold">Analytics</span>
+                        </div>
+                        <div class="flex items-center space-x-2 p-2 bg-stone-50 rounded border border-stone-100">
+                            <span class="text-cyan-500 text-lg">●</span>
+                            <span class="text-xs font-semibold">Canva / Figma</span>
+                        </div>
+                        <div class="flex items-center space-x-2 p-2 bg-stone-50 rounded border border-stone-100">
+                            <span class="text-blue-400 text-lg">●</span>
+                            <span class="text-xs font-semibold">Trello</span>
+                        </div>
+                        <div class="flex items-center space-x-2 p-2 bg-stone-50 rounded border border-stone-100">
+                            <span class="text-indigo-500 text-lg">●</span>
+                            <span class="text-xs font-semibold">Moodle</span>
+                        </div>
+                        <div class="flex items-center space-x-2 p-2 bg-stone-50 rounded border border-stone-100">
+                            <span class="text-green-500 text-lg">●</span>
+                            <span class="text-xs font-semibold">Looker Studio</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Middle & Right Column: Timeline & Curriculum (2/3) -->
+            <div class="lg:col-span-2 space-y-8">
+                
+                <!-- Main Curriculum Card -->
+                <div class="card p-6 min-h-[500px]">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                        <h3 class="text-xl font-bold text-stone-800 flex items-center">
+                            <span class="mr-2">📅</span> Cronograma Secuencial (16 Semanas)
+                        </h3>
+                        <!-- Toggle -->
+                        <div class="flex space-x-2 mt-4 sm:mt-0">
+                            <button id="btn-block1" onclick="switchBlock(1)" class="px-4 py-2 rounded-lg text-sm font-medium border active-tab transition">
+                                Bloque 1: Incubación
+                            </button>
+                            <button id="btn-block2" onclick="switchBlock(2)" class="px-4 py-2 rounded-lg text-sm font-medium border inactive-tab transition">
+                                Bloque 2: Prácticas
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Content Area -->
+                    <div id="curriculum-content" class="space-y-6">
+                        <!-- Content injected via JS -->
+                    </div>
+
+                    <!-- Gemini Incident Generator -->
+                    <div class="mt-8 pt-6 border-t border-stone-100">
+                        <h4 class="text-base font-semibold text-stone-700 mb-3 flex items-center">
+                            <span class="mr-2">🧠</span> Herramientas para la "Central Digital"
+                        </h4>
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <button id="incident-generator-btn" onclick="generateIncident()" class="flex-shrink-0 px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-sm font-semibold transition shadow-md">
+                                ✨ Idea de Incidente Crítico (Bloque 2)
+                            </button>
+                            <div id="incident-output" class="text-sm p-3 bg-rose-50 rounded-lg border border-rose-200 text-stone-700 w-full">
+                                Presione el botón para generar una nueva crisis de simulación.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Evaluation Section -->
+        <section class="mb-8">
+            <div class="card p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 class="text-lg font-bold text-stone-800 mb-4 flex items-center">
+                            <span class="mr-2">⚖️</span> Sistema de Evaluación "Anti-Polizón"
+                        </h3>
+                        <p class="text-sm text-stone-600 mb-4">
+                            Diseñado para equilibrar el éxito de la agencia (grupal) con la responsabilidad individual en un entorno masivo.
+                        </p>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex items-center justify-between p-2 bg-stone-50 rounded">
+                                <span class="font-medium">🎭 Desempeño por Rol (Indiv.)</span>
+                                <span class="text-indigo-600 font-bold">30%</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2 bg-stone-50 rounded">
+                                <span class="font-medium">📈 KPIs Simulados (Grupal)</span>
+                                <span class="text-blue-500 font-bold">25%</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2 bg-stone-50 rounded">
+                                <span class="font-medium">🧠 Estrategia & Pivoteo (Grupal)</span>
+                                <span class="text-teal-500 font-bold">20%</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2 bg-stone-50 rounded">
+                                <span class="font-medium">📑 Informe & Defensa (Grupal)</span>
+                                <span class="text-amber-500 font-bold">15%</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2 bg-stone-50 rounded">
+                                <span class="font-medium">🤝 Ética & Cumplimiento (Indiv.)</span>
+                                <span class="text-rose-500 font-bold">10%</span>
+                            </li>
+                        </ul>
+
+                        <!-- Gemini Defense Question Generator -->
+                        <div class="mt-6 pt-4 border-t border-stone-100">
+                            <button id="question-generator-btn" onclick="generateDefenseQuestions()" class="w-full px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-sm font-semibold transition shadow-md">
+                                ✨ Preguntas Clave para la Defensa Final
+                            </button>
+                            <div id="questions-output" class="mt-3 text-sm p-3 bg-indigo-50 rounded-lg border border-indigo-200 text-stone-700 w-full">
+                                Presione el botón para obtener 3 preguntas difíciles sobre la estrategia y los KPIs.
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="flex justify-center">
+                        <div class="chart-container">
+                            <canvas id="evalChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- New Section: Curricular Coverage Analysis -->
+        <section class="mb-8">
+            <div class="card p-6">
+                <h3 class="text-lg font-bold text-stone-800 mb-4 flex items-center">
+                    <span class="mr-2">📋</span> Análisis de Cobertura Curricular
+                </h3>
+                <p class="text-sm text-stone-600 mb-4">
+                    Utilice esta herramienta para evaluar si una Estrategia de Agencia (o resumen de proyecto) cumple con los <strong>Objetivos</strong> y <strong>Contenidos Mínimos</strong> del programa de "Proyecto Final" (Bloque 1) proporcionados.
+                </p>
+
+                <div class="space-y-4">
+                    <div>
+                        <label for="strategy-input" class="block text-sm font-medium text-stone-700 mb-1">
+                            Pegue aquí el resumen de la estrategia o plan de la agencia:
+                        </label>
+                        <textarea id="strategy-input" rows="6" class="w-full p-3 border border-stone-300 rounded-lg focus:ring-teal-500 focus:border-teal-500 text-sm" placeholder="Ej: La agencia 'Digital Wave' se enfocará en el nicho de productos sostenibles. Se definirá un modelo de negocio DNVB con un análisis de viabilidad económica detallado..."></textarea>
+                    </div>
+                    
+                    <button id="coverage-analyser-btn" onclick="analyzeStrategyCoverage()" class="w-full px-4 py-3 bg-teal-500 hover:bg-teal-600 text-white rounded-lg text-sm font-semibold transition shadow-md">
+                        ✨ Analizar Cobertura del Programa
+                    </button>
+
+                    <div id="coverage-output" class="mt-4 p-4 bg-teal-50 rounded-lg border border-teal-200 text-stone-700 w-full content-panel max-h-96 overflow-y-auto markdown-output">
+                        El informe de cobertura aparecerá aquí tras el análisis.
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-stone-200 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <p class="text-center text-xs text-stone-400">
+                Diseño de Propuesta Académica Integral • Basado en el modelo de "Empresa Simulada"
+            </p>
+        </div>
+    </footer>
+    
+    <!-- Modal 1: Program Details (Objetivos and Contenidos) -->
+    <div id="programModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('programModal')">&times;</span>
+            <h2 class="text-2xl font-bold text-stone-800 mb-4 flex items-center">
+                <span class="mr-2 text-indigo-500">📄</span> Programa Oficial: Proyecto Final
+            </h2>
+            <p class="text-sm text-stone-600 mb-6">
+                Espacio Curricular: Proyecto Final (Código: 22) - Disciplinas Tecnológicas
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Objectives Column -->
+                <div>
+                    <h3 class="text-xl font-semibold text-indigo-700 border-b border-indigo-200 pb-2 mb-3">Objetivos</h3>
+                    <ul id="modal-objectives-list" class="space-y-3 text-sm text-stone-700 list-disc pl-5">
+                        <!-- Content injected via JS -->
+                    </ul>
+                </div>
+
+                <!-- Contents Column -->
+                <div>
+                    <h3 class="text-xl font-semibold text-teal-700 border-b border-teal-200 pb-2 mb-3">Contenidos Mínimos</h3>
+                    <ul id="modal-contents-list" class="space-y-3 text-sm text-stone-700 list-disc pl-5">
+                        <!-- Content injected via JS -->
+                    </ul>
+                </div>
+            </div>
+            
+            <button onclick="closeModal('programModal')" class="mt-8 w-full px-4 py-2 bg-stone-200 hover:bg-stone-300 text-stone-700 rounded-lg text-sm font-semibold transition">
+                Cerrar
+            </button>
+        </div>
+    </div>
+    
+    <!-- Modal 2: Project Structure -->
+    <div id="structureModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('structureModal')">&times;</span>
+            <h2 class="text-2xl font-bold text-stone-800 mb-4 flex items-center">
+                <span class="mr-2 text-teal-500">🗂️</span> Estructura Moodle/Repositorio de Proyecto
+            </h2>
+            <p class="text-sm text-stone-600 mb-6">
+                Organización sugerida de las carpetas y documentos de la Agencia, siguiendo un flujo de trabajo profesional y auditable.
+            </p>
+
+            <div class="folder-structure">
+                <!-- Content injected via JS -->
+            </div>
+            
+            <button onclick="closeModal('structureModal')" class="mt-8 w-full px-4 py-2 bg-stone-200 hover:bg-stone-300 text-stone-700 rounded-lg text-sm font-semibold transition">
+                Cerrar
+            </button>
+        </div>
+    </div>
+
+
+    <!-- Logic Script -->
+    <script>
+        // --- Data Models (Programa Oficial) ---
+
+        const programObjectives = [
+            "Conocer las herramientas para la elaboración de un proyecto de comercio electrónico en diferentes ámbitos e industrias.",
+            "Elaborar un plan en el que pueda desarrollarse y documentarse la práctica profesional.",
+            "Identificar y reconocer áreas problemáticas en distintos ámbitos de los negocios online interpretando las áreas problemáticas como oportunidades para el desarrollo.",
+            "Integrar y aplicar los conocimientos adquiridos durante la formación.",
+            "Determinar las relevancia de las medidas a desarrollar.",
+            "Generar un registro de las actividades realizadas."
+        ];
+
+        const programContents = [
+            "La investigación de mercado consumidor online.",
+            "Definición del Modelo de negocios online.",
+            "Formulación del proyecto y viabilidad económica.",
+            "Diseño del plan de desarrollo del sitio web.",
+            "Diseño del Plan de marketing digital.",
+            "Definición de objetivos, presupuestos, compra de medios y ejecución.",
+            "Kpis y métricas bases para la medición de efectividad de operación del negocio online."
+        ];
+        
+        const projectStructure = `
+📦 REPOSITORIO DE LA AGENCIA: [Nombre de la Agencia]
+
+├── 📁 01_GOVERNANCE_Y_CONTROL (Documentos internos)
+│   ├── 📄 Plan_de_Rotacion_de_Roles.pdf
+│   ├── 📄 Acta_Constitucion_Simulada.pdf
+│   └── 📄 Bitacora_Semanal_de_Tareas.xls / Trello/Asana Link
+|
+├── 📁 02_PROYECTO_FINAL (Documentación Bloque 1 - Estrategia)
+│   ├── 📁 2.1_INVESTIGACION_Y_NICHOS
+│   │   ├── 📄 Informe_Analisis_Competencia.pdf
+│   │   └── 📄 Buyer_Persona_Definicion.pdf
+│   ├── 📁 2.2_MODELO_DE_NEGOCIO
+│   │   ├── 📄 Canvas_Modelo_Negocio_E-commerce.pdf
+│   │   └── 📄 Estudio_Viabilidad_Economica.xls
+│   ├── 📁 2.3_IDENTIDAD_Y_MARKETING
+│   │   ├── 📄 Manual_de_Marca_y_Branding.pdf
+│   │   └── 📄 Plan_de_Medios_Bloque1.pdf
+|
+├── 📁 03_PRACTICAS_SITUADAS (Documentación Bloque 2 - Ejecución y Auditoría)
+│   ├── 📁 3.1_GESTORIA_SIMULADA (Comunicaciones con la Central)
+│   │   ├── 📄 Reclamos_Proveedor_Central.pdf
+│   │   ├── 📄 Documentacion_Recibida_(Facturas_Cheques_Extractos).pdf
+│   │   └── 📄 Respuesta_a_Incidente_[Nombre].pdf
+│   ├── 📁 3.2_EVIDENCIA_TECNOLOGICA
+│   │   ├── 📸 Screenshots_Campanas_Ads.zip
+│   │   └── 📄 Link_a_Dashboard_Looker_Studio.txt
+│   └── 📁 3.3_INFORME_FINAL
+│       ├── 📄 INFORME_RENDIMIENTO_FINAL.pdf
+│       └── 📄 Presentacion_Defensa_Final.pptx
+|
+└── 📁 04_RECURSOS_Y_CREATIVIDAD
+    ├── 📁 Artes_Finales_Ads
+    └── 📁 Copys_y_Textos_Legales
+        `;
+
+        const roleData = {
+            'titular': {
+                title: "Titulares (La Central Digital)",
+                desc: "En el Bloque 1 actúan como 'Registro Mercantil' aprobando briefs. En el Bloque 2 se convierten en el 'Algoritmo', inyectando crisis simuladas (caídas de servidor, cambios de política) para testear la respuesta de los alumnos.",
+                color: "bg-rose-50 border-rose-200 text-rose-900"
+            },
+            'adjunto': {
+                title: "Adjuntos (Mentores de Cámara)",
+                desc: "Cada uno gestiona una 'Cámara Empresarial' de 75 alumnos (aprox. 15 agencias). Su foco no es enseñar teoría, sino validar semanalmente en Moodle que las herramientas externas (Trello, Analytics) se estén usando correctamente.",
+                color: "bg-blue-50 border-blue-200 text-blue-900"
+            },
+            'alumno': {
+                title: "Estudiantes (Gestores Digitales)",
+                desc: "Organizados en agencias, asumen roles rotativos. Deben configurar un CMS real, diseñar planes de medios y, en el Bloque 2, optimizar métricas basándose en datos simulados y reportar en Looker Studio.",
+                color: "bg-green-50 border-green-200 text-green-900"
+            }
+        };
+
+        const curriculumData = {
+            1: {
+                title: "Bloque 1: Proyecto Final (Setup & Estrategia)",
+                subtitle: "Semanas 1-8 • Foco: Incubación",
+                color: "text-indigo-600",
+                description: "En esta fase, las agencias se constituyen, definen su identidad y configuran su infraestructura tecnológica. El objetivo es llegar a la semana 8 con un Activo Digital funcional.",
+                phases: [
+                    {
+                        weeks: "Sem 1-2",
+                        topic: "Génesis & Identidad",
+                        details: "Formación de Agencias. Definición de Nicho. Branding y Manual de Marca. Setup inicial de Trello/Asana."
+                    },
+                    {
+                        weeks: "Sem 3-5",
+                        topic: "Desarrollo del Activo Digital",
+                        details: "Configuración del CMS (WordPress/Shopify). Carga de catálogo. Integración de pasarelas de pago (Sandbox). UX/UI Check."
+                    },
+                    {
+                        weeks: "Sem 6-7",
+                        topic: "Estrategia de Medios",
+                        details: "Plan de Marketing. Definición de Buyer Persona. Setup de cuentas publicitarias (Meta Business Suite - Simulado)."
+                    },
+                    {
+                        weeks: "Sem 8",
+                        topic: "💎 HITO DE CORTE: MVP",
+                        details: "Entrega del E-commerce 100% funcional. Auditoría técnica por parte de los Adjuntos. Solo los aprobados pasan al Bloque 2.",
+                        highlight: true
+                    }
+                ]
+            },
+            2: {
+                title: "Bloque 2: Prácticas Situadas (Operación & Growth)",
+                subtitle: "Semanas 9-16 • Foco: Ejecución y Crisis",
+                color: "text-emerald-600",
+                description: "La simulación cobra vida. La 'Central Digital' inyecta tráfico y eventos. Los alumnos deben gestionar campañas, resolver crisis y optimizar en base a datos.",
+                phases: [
+                    {
+                        weeks: "Sem 9-10",
+                        topic: "Go-to-Market",
+                        details: "Lanzamiento oficial. Ejecución de campañas de tráfico. Primeros reportes de métricas (Analytics)."
+                    },
+                    {
+                        weeks: "Sem 11-13",
+                        topic: "Gestión de Crisis & CRO",
+                        details: "🚨 Incidente Crítico: 'Influencer habla mal de la marca' o 'Caída de servidor'. Gestión de reputación. A/B Testing de Landing Pages."
+                    },
+                    {
+                        weeks: "Sem 14-15",
+                        topic: "Analítica & Optimización",
+                        details: "Análisis de ROI/ROAS. Ajuste de presupuestos. Elaboración de Dashboard de rendimiento en Looker Studio."
+                    },
+                    {
+                        weeks: "Sem 16",
+                        topic: "💎 HITO FINAL: Defensa",
+                        details: "Presentación del Informe de Rendimiento ante el directorio (Docentes). Defensa oral y cierre de la simulación.",
+                        highlight: true
+                    }
+                ]
+            }
+        };
+
+        const incidentosPrevios = "Incidente 1: Baja de demanda sostenida. Incidente 2: Mora en cobro a clientes clave. Incidente 3: Quiebre de stock no previsto. Incidente Crítico: 'Influencer habla mal de la marca' o 'Caída de servidor'.";
+
+        // --- Utility Functions ---
+
+        function updateRoleDetails(roleKey) {
+            const data = roleData[roleKey];
+            const container = document.getElementById('role-details');
+            const title = document.getElementById('role-title');
+            const desc = document.getElementById('role-desc');
+
+            title.textContent = data.title;
+            desc.textContent = data.desc;
+
+            container.className = `mt-4 p-4 rounded-lg border text-sm text-stone-700 animate-fade-in ${data.color}`;
+        }
+
+        function renderCurriculum(blockId) {
+            const data = curriculumData[blockId];
+            const container = document.getElementById('curriculum-content');
+            
+            let html = `
+                <div class="mb-6">
+                    <h4 class="text-lg font-bold ${data.color}">${data.title}</h4>
+                    <p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">${data.subtitle}</p>
+                    <p class="text-stone-600 text-sm bg-stone-50 p-3 rounded border border-stone-100">${data.description}</p>
+                </div>
+                <div class="space-y-4">
+            `;
+
+            data.phases.forEach(phase => {
+                const borderClass = phase.highlight ? 'border-l-4 border-amber-400 bg-amber-50' : 'border-l-4 border-stone-300 bg-white';
+                const textClass = phase.highlight ? 'text-amber-900' : 'text-stone-800';
+                
+                html += `
+                    <div class="p-4 rounded shadow-sm ${borderClass} transition hover:shadow-md">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs font-bold uppercase text-stone-500 bg-white px-2 py-1 rounded border">${phase.weeks}</span>
+                            ${phase.highlight ? '<span class="text-xs font-bold text-amber-600">★ HITO CRÍTICO</span>' : ''}
+                        </div>
+                        <h5 class="font-bold ${textClass} mb-1">${phase.topic}</h5>
+                        <p class="text-sm text-stone-600">${phase.details}</p>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function switchBlock(blockId) {
+            // Update Buttons
+            const btn1 = document.getElementById('btn-block1');
+            const btn2 = document.getElementById('btn-block2');
+
+            if (blockId === 1) {
+                btn1.classList.remove('inactive-tab');
+                btn1.classList.add('active-tab');
+                btn2.classList.remove('active-tab');
+                btn2.classList.add('inactive-tab');
+            } else {
+                btn2.classList.remove('inactive-tab');
+                btn2.classList.add('active-tab');
+                btn1.classList.remove('active-tab');
+                btn1.classList.add('inactive-tab');
+            }
+
+            // Render Content
+            renderCurriculum(blockId);
+        }
+
+        // --- Modal Functions ---
+        
+        function populateModal() {
+            const objList = document.getElementById('modal-objectives-list');
+            const contList = document.getElementById('modal-contents-list');
+            const structContainer = document.querySelector('#structureModal .folder-structure');
+
+            // Populate Objectives
+            objList.innerHTML = programObjectives.map(obj => `<li>${obj}</li>`).join('');
+
+            // Populate Contents
+            contList.innerHTML = programContents.map(cont => `<li>${cont}</li>`).join('');
+            
+            // Populate Structure
+            structContainer.textContent = projectStructure.trim();
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const programModal = document.getElementById('programModal');
+            const structureModal = document.getElementById('structureModal');
+            if (event.target == programModal) {
+                programModal.style.display = "none";
+            }
+            if (event.target == structureModal) {
+                structureModal.style.display = "none";
+            }
+        }
+
+
+        // --- Chart Initialization ---
+
+        function initChart() {
+            const ctx = document.getElementById('evalChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Rol Individual', 'KPIs Simulados', 'Estrategia', 'Informe Final', 'Ética'],
+                    datasets: [{
+                        data: [30, 25, 20, 15, 10],
+                        backgroundColor: [
+                            '#4f46e5', 
+                            '#3b82f6', 
+                            '#14b8a6', 
+                            '#f59e0b', 
+                            '#f43f5e'  
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.raw + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Gemini API Functions ---
+
+        async function fetchGeminiResponse(systemPrompt, userQuery) {
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+            };
+
+            const maxRetries = 3;
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (text) {
+                        return text.trim();
+                    }
+                    return "Error al generar respuesta: contenido no encontrado.";
+
+                } catch (error) {
+                    console.error("Fetch error on attempt " + (attempt + 1) + ":", error);
+                    if (attempt < maxRetries - 1) {
+                        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+                    } else {
+                        return "Error de conexión o API. Intente nuevamente.";
+                    }
+                }
+            }
+        }
+
+        async function generateIncident() {
+            const btn = document.getElementById('incident-generator-btn');
+            const output = document.getElementById('incident-output');
+            
+            btn.disabled = true;
+            output.innerHTML = 'Generando incidente... <span class="animate-pulse">●●●</span>';
+
+            const systemPrompt = `Actúa como el 'Algoritmo de la Central Digital' de una simulación de e-commerce para una universidad. Tu tarea es generar un NUEVO INCIDENTE CRÍTICO de mercado o tecnológico. El objetivo es que las agencias (grupos de estudiantes) tengan que pivotar su estrategia de e-commerce y marketing digital. El incidente debe ser realista y desafiante.`;
+            const userQuery = `Genera un nuevo Incidente Crítico. Debe ser diferente a los siguientes incidentes ya utilizados: ${incidentosPrevios}. El incidente debe ser aplicable a cualquier tipo de e-commerce (Retail, B2B o DNVB). Presenta la respuesta en español en el siguiente formato: Título del Incidente: [Título] / Impacto Clave: [Descripción corta del impacto en métricas] / Desafío para la Agencia: [Qué deben hacer los alumnos para resolverlo, máximo 2 puntos].`;
+            
+            const responseText = await fetchGeminiResponse(systemPrompt, userQuery);
+            
+            output.innerHTML = responseText.replace(/\n/g, '<br>');
+            btn.disabled = false;
+        }
+
+        async function generateDefenseQuestions() {
+            const btn = document.getElementById('question-generator-btn');
+            const output = document.getElementById('questions-output');
+            
+            btn.disabled = true;
+            output.innerHTML = 'Generando preguntas... <span class="animate-pulse">●●●</span>';
+
+            const systemPrompt = `Eres un Director de Cuentas (Mentor Adjunto) que prepara la defensa final de una simulación de e-commerce. Genera 3 preguntas de alto nivel para evaluar a un grupo de estudiantes. Las preguntas deben cubrir los siguientes ejes de evaluación: Estrategia & Pivoteo (20%) y Desempeño por Rol (30%). No preguntes por métricas específicas, sino por las decisiones y el razonamiento detrás de ellas.`;
+            const userQuery = `Genera 3 preguntas de defensa final. Cada pregunta debe enfocarse en un aspecto de toma de decisiones o justificación de rol. Ejemplo de formato: Pregunta 1: [Texto de la pregunta].`;
+            
+            const responseText = await fetchGeminiResponse(systemPrompt, userQuery);
+            
+            // Format response as a list for better readability
+            const formattedResponse = responseText.split('\n').map(line => {
+                if (line.trim().startsWith('Pregunta')) {
+                    return `<span class="font-bold block mt-2">${line.trim()}</span>`;
+                }
+                return line.trim();
+            }).join(' ');
+
+            output.innerHTML = formattedResponse;
+            btn.disabled = false;
+        }
+        
+        async function analyzeStrategyCoverage() {
+            const btn = document.getElementById('coverage-analyser-btn');
+            const output = document.getElementById('coverage-output');
+            const strategyInput = document.getElementById('strategy-input').value.trim();
+
+            if (!strategyInput) {
+                output.innerHTML = '<span class="text-red-600">Por favor, pegue el resumen de la estrategia antes de analizar.</span>';
+                return;
+            }
+            
+            btn.disabled = true;
+            output.innerHTML = 'Analizando cobertura curricular... <span class="animate-pulse">●●●</span>';
+
+            const objectivesList = programObjectives.map((o, i) => `Objetivo ${i+1}: ${o}`).join('\n');
+            const contentsList = programContents.map((c, i) => `Contenido ${i+1}: ${c}`).join('\n');
+
+
+            const systemPrompt = `Eres un analista curricular experto en educación tecnológica y e-commerce. Tu tarea es evaluar la cobertura de un proyecto de e-commerce estudiantil (la 'Estrategia') contra el programa oficial de la asignatura 'Proyecto Final'. Debes ser objetivo y analizar si cada punto del programa está cubierto o no en la estrategia provista.`;
+            
+            const userQuery = `A continuación se presenta el Programa Oficial y la Estrategia.
+
+Programa Oficial - Objetivos a Cumplir:
+${objectivesList}
+
+Programa Oficial - Contenidos Mínimos a Cubrir:
+${contentsList}
+
+Estrategia de la Agencia Estudiantil (Texto provisto): 
+"${strategyInput}"
+
+Realiza el análisis y genera un informe detallado en español. Para cada punto del Programa Oficial, indica si está 'CUBIERTO' o 'NO CUBIERTO' por la estrategia, y proporciona una breve 'Justificación' (1-2 frases) basada exclusivamente en el texto de la estrategia provista.
+
+Formato de Salida (Markdown, utilizando solo negritas para títulos y asteriscos para listas):
+### Cobertura de Objetivos
+* **Objetivo 1**: [CUBIERTO/NO CUBIERTO]. Justificación: [Razón]
+...
+### Cobertura de Contenidos Mínimos
+* **Contenido 1**: [CUBIERTO/NO CUBIERTO]. Justificación: [Razón]
+...
+`;
+            
+            const responseText = await fetchGeminiResponse(systemPrompt, userQuery);
+            
+            // The response is processed to handle newlines as line breaks for readability in the simple div.
+            // Replace markdown list items and titles with simple bold text for display consistency.
+            let formattedHtml = responseText.replace(/###\s*(.*)/g, (match, p1) => `<h3>${p1}</h3>`);
+            formattedHtml = formattedHtml.replace(/\*\s*\*\*(.*?)\*\*/g, (match, p1) => `<li><span class="font-bold">${p1.trim()}</span>`);
+            formattedHtml = `<ul>${formattedHtml}</ul>`;
+            
+            output.innerHTML = formattedHtml;
+            btn.disabled = false;
+        }
+
+
+        // --- Initialization ---
+
+        window.onload = function() {
+            // Initialize with Block 1
+            renderCurriculum(1);
+            // Default Role info
+            updateRoleDetails('titular');
+            // Init Chart
+            initChart();
+            // Populate Modal Content
+            populateModal();
+        };
+
+    </script>
+</body>
+</html>
